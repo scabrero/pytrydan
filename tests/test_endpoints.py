@@ -137,8 +137,7 @@ def test_charge_mode_when_available():
         == ChargeMode.THREEPHASIC
     )
     assert (
-        TrydanData.from_api({**data, "ChargeMode": 2}).charge_mode
-        == ChargeMode.MIXED
+        TrydanData.from_api({**data, "ChargeMode": 2}).charge_mode == ChargeMode.MIXED
     )
 
 
