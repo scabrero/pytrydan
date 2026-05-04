@@ -1,98 +1,106 @@
 # Changelog
 
-<!--next-version-placeholder-->
+## v1.0.0 (2026-05-04)
+
+### Features
+
+- Adds lightled and logoled properties ([`905e5ea`](https://github.com/dgomes/pytrydan/commit/905e5ea00dcd7f4006bec9e62b73c1da7e36ea02))
+- Adds charge mode property ([`9a4a7d9`](https://github.com/dgomes/pytrydan/commit/9a4a7d95ffa93e16963a7cc676ebcda6fe821533))
+- Adds installation voltage property ([`9c93f36`](https://github.com/dgomes/pytrydan/commit/9c93f3612e629e5a55912a5152aeb11c6065ebe7))
+- Update charge state handling and require python 3.14 ([`3d87e59`](https://github.com/dgomes/pytrydan/commit/3d87e5982313071880166cde336f3c60f9c137b1))
 
 ## v0.8.1 (2024-07-31)
 
-### Fix
+### Bug fixes
 
-* Catch unhandled exception ([`15b4e16`](https://github.com/dgomes/pytrydan/commit/15b4e16c444e9a8b6149568ecae35522c52c0938))
+- Catch unhandled exception ([`15b4e16`](https://github.com/dgomes/pytrydan/commit/15b4e16c444e9a8b6149568ecae35522c52c0938))
 
 ## v0.8.0 (2024-07-30)
 
-### Feature
+### Features
 
-* Support version 2.1.17 ([`7094b4c`](https://github.com/dgomes/pytrydan/commit/7094b4ccef86ac7395062cd0beec55cc308a939e))
+- Support version 2.1.17 ([`7094b4c`](https://github.com/dgomes/pytrydan/commit/7094b4ccef86ac7395062cd0beec55cc308a939e))
 
 ## v0.7.0 (2024-06-02)
 
-### Feature
+### Features
 
-* Add raw_data property ([`8055943`](https://github.com/dgomes/pytrydan/commit/8055943a0d2fe128f7a60bbf833954709700bfc0))
+- Add raw_data property ([`8055943`](https://github.com/dgomes/pytrydan/commit/8055943a0d2fe128f7a60bbf833954709700bfc0))
 
 ## v0.6.1 (2024-05-11)
 
-### Fix
+### Bug fixes
 
-* Misspelling ([`87f2f27`](https://github.com/dgomes/pytrydan/commit/87f2f275d92ee3f5fa8947a9fc5e9d170cc5ff40))
+- Misspelling ([`87f2f27`](https://github.com/dgomes/pytrydan/commit/87f2f275d92ee3f5fa8947a9fc5e9d170cc5ff40))
 
 ## v0.6.0 (2024-05-09)
 
-### Feature
+### Bug fixes
 
-* Add error codes according to V2C support ([`ee8726c`](https://github.com/dgomes/pytrydan/commit/ee8726c51eae1ad99874ac1a0f9cf0f2e3d3c4c7))
+- Address errors communicated by v2c support ([`ab1123e`](https://github.com/dgomes/pytrydan/commit/ab1123e8ba5dd755f8f98fe4fa04ff66cc7f772b))
 
-### Fix
+### Features
 
-* Address errors communicated by V2C support ([`ab1123e`](https://github.com/dgomes/pytrydan/commit/ab1123e8ba5dd755f8f98fe4fa04ff66cc7f772b))
+- Add error codes according to v2c support ([`ee8726c`](https://github.com/dgomes/pytrydan/commit/ee8726c51eae1ad99874ac1a0f9cf0f2e3d3c4c7))
 
 ## v0.5.0 (2024-05-09)
 
-### Feature
+### Features
 
-* CLI binary sensors ([`404fc0c`](https://github.com/dgomes/pytrydan/commit/404fc0cb5ba09e485d56818d7f5a3f27d78197f6))
+- Cli binary sensors ([`404fc0c`](https://github.com/dgomes/pytrydan/commit/404fc0cb5ba09e485d56818d7f5a3f27d78197f6))
 
 ## v0.4.0 (2023-11-09)
 
-### Feature
+### Features
 
-* Add binary sensors ([`8c24a3a`](https://github.com/dgomes/pytrydan/commit/8c24a3ac4c10bb310f83c08d7c4f565a136d61b3))
+- Add binary sensors ([`8c24a3a`](https://github.com/dgomes/pytrydan/commit/8c24a3ac4c10bb310f83c08d7c4f565a136d61b3))
 
 ## v0.3.0 (2023-11-08)
 
-### Feature
+### Features
 
-* Validate keywords ([`999e754`](https://github.com/dgomes/pytrydan/commit/999e7549dbd6d0444191ac435b79ff14213467d7))
+- Validate keywords ([`999e754`](https://github.com/dgomes/pytrydan/commit/999e7549dbd6d0444191ac435b79ff14213467d7))
 
-### Fix
+### Bug fixes
 
-* Export all symbols ([`cb41538`](https://github.com/dgomes/pytrydan/commit/cb41538bf9b5c648af90297bcde39ecda0aa6ab4))
+- Export all symbols ([`cb41538`](https://github.com/dgomes/pytrydan/commit/cb41538bf9b5c648af90297bcde39ecda0aa6ab4))
 
 ## v0.2.0 (2023-11-08)
 
-### Feature
+### Features
 
-* Add methods to control trydan ([`ae40996`](https://github.com/dgomes/pytrydan/commit/ae409965a1689b2d085c9a50507752f8dea3e833))
+- Add methods to control trydan ([`ae40996`](https://github.com/dgomes/pytrydan/commit/ae409965a1689b2d085c9a50507752f8dea3e833))
 
 ## v0.1.3 (2023-11-06)
 
-### Fix
+### Bug fixes
 
-* Raise proper error on get_data() timeout ([`26eaac2`](https://github.com/dgomes/pytrydan/commit/26eaac2700637fe4ac77baac9aee1b5c1a601e24))
+- Raise proper error on get_data() timeout ([`26eaac2`](https://github.com/dgomes/pytrydan/commit/26eaac2700637fe4ac77baac9aee1b5c1a601e24))
 
 ## v0.1.2 (2023-11-06)
 
-### Fix
+### Bug fixes
 
-* Flexibilize typer to accomodate HA dependencies ([`bed04da`](https://github.com/dgomes/pytrydan/commit/bed04dabc9a501aff97e74e9c3bbdd43b27b709b))
+- Flexibilize typer to accomodate ha dependencies ([`bed04da`](https://github.com/dgomes/pytrydan/commit/bed04dabc9a501aff97e74e9c3bbdd43b27b709b))
 
 ## v0.1.1 (2023-11-06)
 
-### Fix
+### Bug fixes
 
-* Lower typer to accomodate HA dependencies ([`6af5e28`](https://github.com/dgomes/pytrydan/commit/6af5e28cffffbd00b0dd80adcfb07af807df4793))
+- Lower typer to accomodate ha dependencies ([`6af5e28`](https://github.com/dgomes/pytrydan/commit/6af5e28cffffbd00b0dd80adcfb07af807df4793))
 
 ## v0.1.0 (2023-11-06)
 
-### Feature
+## v0.0.2 (2023-11-06)
 
-* Add data cache ([`fe4faec`](https://github.com/dgomes/pytrydan/commit/fe4faec38af2ef8a1bef7e187ef5428be604e3e1))
+### Features
+
+- Add data cache ([`fe4faec`](https://github.com/dgomes/pytrydan/commit/fe4faec38af2ef8a1bef7e187ef5428be604e3e1))
 
 ### Documentation
 
-* Improve formating ([`a66f853`](https://github.com/dgomes/pytrydan/commit/a66f8539a4a92a788adee764bab8bda776cfc51a))
-* Add usage ([`2806119`](https://github.com/dgomes/pytrydan/commit/280611950c64b68a667c44e6f79973d5f099c208))
-
+- Improve formating ([`a66f853`](https://github.com/dgomes/pytrydan/commit/a66f8539a4a92a788adee764bab8bda776cfc51a))
+- Add usage ([`2806119`](https://github.com/dgomes/pytrydan/commit/280611950c64b68a667c44e6f79973d5f099c208))
 
 ## v0.0.0 (2023-11-05)
 
