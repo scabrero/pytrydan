@@ -37,4 +37,13 @@ async def test_binary_sensors():
 
     with pytest.raises(TrydanInvalidValue) as e_info:
         await envoy.intensity(100)
-        assert "Intensity must be between 6 and 32" == str(e_info.value)
+    assert "Intensity must be between 6 and 32" == str(e_info.value)
+
+    respx.get("/write/VoltageInstallation=230").mock(
+        return_value=Response(200, text="OK")
+    )
+    assert await envoy.voltage_installation(230) is None
+
+    with pytest.raises(TrydanInvalidValue) as e_info:
+        await envoy.voltage_installation(0)
+    assert "Installation Voltage must be positive" == str(e_info.value)

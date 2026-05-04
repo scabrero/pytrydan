@@ -1,6 +1,7 @@
 KEYWORDS = {
     "ChargeState",
     "ChargePower",
+    "VoltageInstallation",
     "ChargeEnergy",
     "SlaveError",
     "ChargeTime",

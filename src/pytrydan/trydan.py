@@ -34,6 +34,7 @@ VALIDATION = {
     "Locked": lambda x: x in LockState,
     "PauseDynamic": lambda x: x in PauseDynamicState,
     "Paused": lambda x: x in PauseState,
+    "VoltageInstallation": lambda x: x > 0,
     "Intensity": lambda x: x >= 6 and x <= 32,
     "MinIntensity": lambda x: x >= 6 and x <= 32,
     "MaxIntensity": lambda x: x >= 6 and x <= 32,
@@ -244,6 +245,13 @@ class Trydan:
             raise TrydanInvalidValue("Intensity must be between 6 and 32")
 
         await self.set_keyword("Intensity", current)
+
+    async def voltage_installation(self, voltage: int) -> None:
+        """Set the installation voltage."""
+        if not (voltage > 0):
+            raise TrydanInvalidValue("Installation Voltage must be positive")
+
+        await self.set_keyword("VoltageInstallation", voltage)
 
     async def dynamic(self, value: bool = True) -> None:
         """Set the Dynamic Intensity Modulation state."""
