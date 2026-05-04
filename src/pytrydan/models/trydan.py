@@ -144,6 +144,8 @@ class TrydanData:
     min_intensity: int
     max_intensity: int
     pause_dynamic: PauseDynamicState
+    light_led: int | None
+    logo_led: int | None
     dynamic_power_mode: DynamicPowerMode
     contracted_power: int
     firmware_version: str | None
@@ -184,6 +186,8 @@ class TrydanData:
             min_intensity=data["MinIntensity"],
             max_intensity=data["MaxIntensity"],
             pause_dynamic=PauseDynamicState(data["PauseDynamic"]),
+            light_led=data.get("LightLED"),
+            logo_led=data.get("LogoLED"),
             dynamic_power_mode=DynamicPowerMode(data["DynamicPowerMode"]),
             contracted_power=data["ContractedPower"],
             firmware_version=data.get("FirmwareVersion"),

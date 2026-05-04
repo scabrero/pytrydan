@@ -146,3 +146,19 @@ def test_charge_mode_when_absent():
     data = _load_json_fixture("RealTimeData")
 
     assert TrydanData.from_api(data).charge_mode is None
+
+
+def test_led_values_when_available():
+    data = _load_json_fixture("RealTimeData")
+    trydan_data = TrydanData.from_api({**data, "LightLED": 75, "LogoLED": 25})
+
+    assert trydan_data.light_led == 75
+    assert trydan_data.logo_led == 25
+
+
+def test_led_values_when_absent():
+    data = _load_json_fixture("RealTimeData")
+    trydan_data = TrydanData.from_api(data)
+
+    assert trydan_data.light_led is None
+    assert trydan_data.logo_led is None

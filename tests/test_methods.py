@@ -54,3 +54,17 @@ async def test_binary_sensors():
     with pytest.raises(TrydanInvalidValue) as e_info:
         await envoy.set_keyword("ChargeMode", 3)
     assert "Value 3 is not valid for keyword ChargeMode" == str(e_info.value)
+
+    respx.get("/write/LightLED=75").mock(return_value=Response(200, text="OK"))
+    assert await envoy.light_led(75) is None
+
+    with pytest.raises(TrydanInvalidValue) as e_info:
+        await envoy.light_led(101)
+    assert "LED intensity must be between 0 and 100" == str(e_info.value)
+
+    respx.get("/write/LogoLED=25").mock(return_value=Response(200, text="OK"))
+    assert await envoy.logo_led(25) is None
+
+    with pytest.raises(TrydanInvalidValue) as e_info:
+        await envoy.logo_led(-1)
+    assert "LED intensity must be between 0 and 100" == str(e_info.value)

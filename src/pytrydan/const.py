@@ -16,6 +16,8 @@ KEYWORDS = {
     "MinIntensity",
     "MaxIntensity",
     "PauseDynamic",
+    "LightLED",
+    "LogoLED",
     "DynamicPowerMode",
     "ContractedPower",
 }

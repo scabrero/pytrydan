@@ -40,6 +40,8 @@ VALIDATION = {
     "Intensity": lambda x: x >= 6 and x <= 32,
     "MinIntensity": lambda x: x >= 6 and x <= 32,
     "MaxIntensity": lambda x: x >= 6 and x <= 32,
+    "LightLED": lambda x: x >= 0 and x <= 100,
+    "LogoLED": lambda x: x >= 0 and x <= 100,
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -259,6 +261,20 @@ class Trydan:
     async def charge_mode(self, mode: ChargeMode) -> None:
         """Set the Charge Mode."""
         await self.set_keyword("ChargeMode", mode)
+
+    async def light_led(self, intensity: int) -> None:
+        """Set the Light LED intensity."""
+        if not (intensity >= 0 and intensity <= 100):
+            raise TrydanInvalidValue("LED intensity must be between 0 and 100")
+
+        await self.set_keyword("LightLED", intensity)
+
+    async def logo_led(self, intensity: int) -> None:
+        """Set the Logo LED intensity."""
+        if not (intensity >= 0 and intensity <= 100):
+            raise TrydanInvalidValue("LED intensity must be between 0 and 100")
+
+        await self.set_keyword("LogoLED", intensity)
 
     async def dynamic(self, value: bool = True) -> None:
         """Set the Dynamic Intensity Modulation state."""
