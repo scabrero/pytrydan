@@ -9,6 +9,7 @@ from .exceptions import (
     TrydanRetryLater,
 )
 from .models.trydan import (
+    ChargeMode,
     ChargePointTimerState,
     ChargeState,
     DynamicPowerMode,
@@ -22,6 +23,7 @@ from .models.trydan import (
 from .trydan import Trydan
 
 __all__ = [
+    "ChargeMode",
     "ChargePointTimerState",
     "ChargeState",
     "ChargeStateInvalid",

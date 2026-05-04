@@ -2,7 +2,7 @@ import pytest
 import respx
 from httpx import Response
 
-from pytrydan import TrydanInvalidValue
+from pytrydan import ChargeMode, TrydanInvalidValue
 
 from .conftest import _get_mock_trydan, _load_json_fixture
 
@@ -47,3 +47,10 @@ async def test_binary_sensors():
     with pytest.raises(TrydanInvalidValue) as e_info:
         await envoy.voltage_installation(0)
     assert "Installation Voltage must be positive" == str(e_info.value)
+
+    respx.get("/write/ChargeMode=2").mock(return_value=Response(200, text="OK"))
+    assert await envoy.charge_mode(ChargeMode.MIXED) is None
+
+    with pytest.raises(TrydanInvalidValue) as e_info:
+        await envoy.set_keyword("ChargeMode", 3)
+    assert "Value 3 is not valid for keyword ChargeMode" == str(e_info.value)

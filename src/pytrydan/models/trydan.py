@@ -87,6 +87,14 @@ class ChargePointTimerState(IntEnum):
     TIMER_ON = 1
 
 
+class ChargeMode(IntEnum):
+    """Enum for Charge Mode."""
+
+    MONOPHASIC = 0
+    THREEPHASIC = 1
+    MIXED = 2
+
+
 class DynamicState(IntEnum):
     """Enum for Dynamic Intensity Modulation State."""
 
@@ -122,6 +130,7 @@ class TrydanData:
     charge_power: float
     voltage_installation: int | None
     charge_energy: float
+    charge_mode: ChargeMode | None
     slave_error: SlaveCommunicationState
     charge_time: int
     house_power: int
@@ -159,6 +168,9 @@ class TrydanData:
             charge_power=data["ChargePower"],
             voltage_installation=data.get("VoltageInstallation"),
             charge_energy=data["ChargeEnergy"],
+            charge_mode=ChargeMode(data["ChargeMode"])
+            if "ChargeMode" in data
+            else None,
             slave_error=SlaveCommunicationState(data["SlaveError"]),
             charge_time=data["ChargeTime"],
             house_power=data["HousePower"],

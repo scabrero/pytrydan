@@ -16,6 +16,7 @@ from .exceptions import (
     TrydanRetryLater,
 )
 from .models.trydan import (
+    ChargeMode,
     ChargePointTimerState,
     ChargeState,
     DynamicPowerMode,
@@ -28,6 +29,7 @@ from .models.trydan import (
 )
 
 VALIDATION = {
+    "ChargeMode": lambda x: x in ChargeMode,
     "ChargeState": lambda x: x in ChargeState,
     "DynamicPowerMode": lambda x: x in DynamicPowerMode,
     "Dynamic": lambda x: x in DynamicState,
@@ -127,6 +129,7 @@ class Trydan:
         keyword: str,
         value: str
         | int
+        | ChargeMode
         | ChargePointTimerState
         | ChargeState
         | DynamicPowerMode
@@ -252,6 +255,10 @@ class Trydan:
             raise TrydanInvalidValue("Installation Voltage must be positive")
 
         await self.set_keyword("VoltageInstallation", voltage)
+
+    async def charge_mode(self, mode: ChargeMode) -> None:
+        """Set the Charge Mode."""
+        await self.set_keyword("ChargeMode", mode)
 
     async def dynamic(self, value: bool = True) -> None:
         """Set the Dynamic Intensity Modulation state."""

@@ -7,7 +7,7 @@ from pytrydan.exceptions import (
     TrydanCommunicationError,
     TrydanInvalidResponse,
 )
-from pytrydan.models.trydan import ChargeState, TrydanData
+from pytrydan.models.trydan import ChargeMode, ChargeState, TrydanData
 
 from .conftest import _get_mock_trydan, _load_json_fixture
 
@@ -123,3 +123,26 @@ def test_charge_state_vendor_values():
         TrydanData.from_api({**data, "ChargeState": 6}).charge_state
         == ChargeState.VENTILATION_REQUIRED
     )
+
+
+def test_charge_mode_when_available():
+    data = _load_json_fixture("RealTimeData")
+
+    assert (
+        TrydanData.from_api({**data, "ChargeMode": 0}).charge_mode
+        == ChargeMode.MONOPHASIC
+    )
+    assert (
+        TrydanData.from_api({**data, "ChargeMode": 1}).charge_mode
+        == ChargeMode.THREEPHASIC
+    )
+    assert (
+        TrydanData.from_api({**data, "ChargeMode": 2}).charge_mode
+        == ChargeMode.MIXED
+    )
+
+
+def test_charge_mode_when_absent():
+    data = _load_json_fixture("RealTimeData")
+
+    assert TrydanData.from_api(data).charge_mode is None
