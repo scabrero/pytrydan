@@ -3,9 +3,11 @@ import respx
 from httpx import Response
 
 from pytrydan.exceptions import (
+    ChargeStateInvalid,
     TrydanCommunicationError,
     TrydanInvalidResponse,
 )
+from pytrydan.models.trydan import ChargeState, TrydanData
 
 from .conftest import _get_mock_trydan, _load_json_fixture
 
@@ -90,3 +92,34 @@ async def test_status_charging():
     assert data.firmware_version == "1.6.18"
     assert data.dynamic_power_mode == 2
     assert data.contracted_power == 4600
+
+
+def test_charge_state_vendor_values():
+    data = _load_json_fixture("RealTimeData")
+
+    assert (
+        TrydanData.from_api({**data, "ChargeState": 0}).charge_state
+        == ChargeState.NOT_CONNECTED
+    )
+    assert (
+        TrydanData.from_api({**data, "ChargeState": 1}).charge_state
+        == ChargeState.CONNECTED_NOT_CHARGING
+    )
+    assert (
+        TrydanData.from_api({**data, "ChargeState": 2}).charge_state
+        == ChargeState.CONNECTED_CHARGING
+    )
+    with pytest.raises(ChargeStateInvalid):
+        TrydanData.from_api({**data, "ChargeState": 3})
+    assert (
+        TrydanData.from_api({**data, "ChargeState": 4}).charge_state
+        == ChargeState.SYSTEM_FAILURE_OR_LEAK_DETECTED
+    )
+    assert (
+        TrydanData.from_api({**data, "ChargeState": 5}).charge_state
+        == ChargeState.CONTROL_PILOT_OR_GROUND_FAILURE
+    )
+    assert (
+        TrydanData.from_api({**data, "ChargeState": 6}).charge_state
+        == ChargeState.VENTILATION_REQUIRED
+    )

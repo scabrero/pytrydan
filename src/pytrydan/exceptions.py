@@ -2,6 +2,10 @@ class TrydanError(Exception):
     """Base class for Trydan errors."""
 
 
+class ChargeStateInvalid(TrydanError):
+    """Raised when Trydan returns an invalid charge state."""
+
+
 class TrydanInvalidResponse(TrydanError):
     """Raised when Trydan returns an invalid response."""
 

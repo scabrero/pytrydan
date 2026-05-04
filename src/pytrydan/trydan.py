@@ -28,7 +28,7 @@ from .models.trydan import (
 )
 
 VALIDATION = {
-    "ChargeState": lambda x: x in ChargePointTimerState,
+    "ChargeState": lambda x: x in ChargeState,
     "DynamicPowerMode": lambda x: x in DynamicPowerMode,
     "Dynamic": lambda x: x in DynamicState,
     "Locked": lambda x: x in LockState,
@@ -127,6 +127,7 @@ class Trydan:
         value: str
         | int
         | ChargePointTimerState
+        | ChargeState
         | DynamicPowerMode
         | DynamicState
         | LockState

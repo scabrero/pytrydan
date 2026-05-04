@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import IntEnum
 from typing import Any
 
+from ..exceptions import ChargeStateInvalid
+
 
 class ChargeState(IntEnum):
     """Enum for Charge State."""
@@ -11,6 +13,9 @@ class ChargeState(IntEnum):
     NOT_CONNECTED = 0
     CONNECTED_NOT_CHARGING = 1
     CONNECTED_CHARGING = 2
+    SYSTEM_FAILURE_OR_LEAK_DETECTED = 4
+    CONTROL_PILOT_OR_GROUND_FAILURE = 5
+    VENTILATION_REQUIRED = 6
 
 
 class ReadyState(IntEnum):
@@ -112,7 +117,7 @@ class TrydanData:
     """Model for Trydan data."""
 
     ID: str | None
-    charge_state: int
+    charge_state: ChargeState
     ready_state: int | None
     charge_power: float
     voltage_installation: int | None
@@ -140,9 +145,16 @@ class TrydanData:
     @classmethod
     def from_api(cls, data: dict[str, Any]) -> TrydanData:
         """Initialize from the API."""
+        try:
+            charge_state = ChargeState(data["ChargeState"])
+        except ValueError as err:
+            raise ChargeStateInvalid(
+                f"Invalid charge state: {data['ChargeState']}"
+            ) from err
+
         return cls(
             ID=data.get("ID"),
-            charge_state=ChargeState(data["ChargeState"]),
+            charge_state=charge_state,
             ready_state=ReadyState(data.get("ReadyState", 0)),
             charge_power=data["ChargePower"],
             voltage_installation=data.get("VoltageInstallation"),
