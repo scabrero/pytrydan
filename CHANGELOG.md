@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.1 (2026-06-04)
+
+### Bug fixes
+
+- Use /read when missing from /realtimedata ([`5f8b9fd`](https://github.com/dgomes/pytrydan/commit/5f8b9fd1d0e99592ce5a57eae025efd639e5709a))
+
 ## v1.0.0 (2026-05-04)
 
 ### Features
