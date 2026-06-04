@@ -128,6 +128,7 @@ class Trydan:
         self._owns_client = client is None
         self._timeout = API_TIMEOUT
         self._data: TrydanData | None = None
+        self._realtime_data_missing_keywords: set[str] | None = None
         self.raw_data: dict[str, bytes | int] | None = None
 
     async def __aenter__(self) -> Trydan:
@@ -204,10 +205,45 @@ class Trydan:
             raise TrydanInvalidResponse("Expected JSON object response from Trydan")
         return data
 
+    async def _read_keyword(self, keyword: str) -> Any:
+        """Read a single keyword from Trydan."""
+        response = await self._request(f"http://{self._host}/read/{keyword}")
+        return self._parse_keyword_value(response.text.strip())
+
+    @staticmethod
+    def _parse_keyword_value(value: str) -> int | float | str:
+        """Parse a text keyword response into a scalar value."""
+        try:
+            return int(value)
+        except ValueError:
+            pass
+
+        try:
+            return float(value)
+        except ValueError:
+            return value
+
+    async def _with_missing_realtime_data_keywords(
+        self, data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Fill RealTimeData with keywords that require the read endpoint."""
+        if self._realtime_data_missing_keywords is None:
+            self._realtime_data_missing_keywords = KEYWORDS.difference(data)
+        else:
+            self._realtime_data_missing_keywords.update(KEYWORDS.difference(data))
+
+        for keyword in sorted(self._realtime_data_missing_keywords):
+            data[keyword] = await self._read_keyword(keyword)
+
+        return data
+
     async def get_data(self) -> TrydanData:
         """Get data from Trydan."""
         try:
             data = await self._json_request(f"http://{self._host}/RealTimeData")
+            raw_data = self.raw_data
+            data = await self._with_missing_realtime_data_keywords(data)
+            self.raw_data = raw_data
         except (ConnectTimeout, httpx.ConnectTimeout) as err:
             raise TrydanRetryLater("Timeout connecting to Trydan") from err
         except httpx.ReadTimeout as err:

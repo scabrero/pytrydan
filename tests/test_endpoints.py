@@ -9,7 +9,11 @@ from pytrydan.exceptions import (
 )
 from pytrydan.models.trydan import ChargeMode, ChargeState, TrydanData
 
-from .conftest import _get_mock_trydan, _load_json_fixture
+from .conftest import (
+    _get_mock_trydan,
+    _load_json_fixture,
+    _mock_missing_realtime_keyword_reads,
+)
 
 
 @pytest.mark.asyncio
@@ -33,9 +37,9 @@ async def test_bad_status():
 @pytest.mark.asyncio
 @respx.mock
 async def test_status():
-    respx.get("/RealTimeData").mock(
-        return_value=Response(200, json=_load_json_fixture("RealTimeData"))
-    )
+    realtime_data = _load_json_fixture("RealTimeData")
+    respx.get("/RealTimeData").mock(return_value=Response(200, json=realtime_data))
+    _mock_missing_realtime_keyword_reads(realtime_data)
 
     envoy = await _get_mock_trydan()
     data = await envoy.get_data()
@@ -57,6 +61,10 @@ async def test_status():
     assert data.min_intensity == 6
     assert data.max_intensity == 16
     assert data.pause_dynamic == 0
+    assert data.voltage_installation == 230
+    assert data.charge_mode == 2
+    assert data.light_led == 75
+    assert data.logo_led == 25
     assert data.firmware_version == "1.6.18"
     assert data.dynamic_power_mode == 2
     assert data.contracted_power == 4600
@@ -65,9 +73,9 @@ async def test_status():
 @pytest.mark.asyncio
 @respx.mock
 async def test_status_charging():
-    respx.get("/RealTimeData").mock(
-        return_value=Response(200, json=_load_json_fixture("RealTimeData_Charging"))
-    )
+    realtime_data = _load_json_fixture("RealTimeData_Charging")
+    respx.get("/RealTimeData").mock(return_value=Response(200, json=realtime_data))
+    _mock_missing_realtime_keyword_reads(realtime_data)
 
     envoy = await _get_mock_trydan()
     data = await envoy.get_data()
@@ -89,9 +97,37 @@ async def test_status_charging():
     assert data.min_intensity == 6
     assert data.max_intensity == 16
     assert data.pause_dynamic == 0
+    assert data.voltage_installation == 230
+    assert data.charge_mode == 2
+    assert data.light_led == 75
+    assert data.logo_led == 25
     assert data.firmware_version == "1.6.18"
     assert data.dynamic_power_mode == 2
     assert data.contracted_power == 4600
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_status_reads_missing_realtime_data_keywords():
+    realtime_data = _load_json_fixture("RealTimeData")
+    respx.get("/RealTimeData").mock(return_value=Response(200, json=realtime_data))
+    _mock_missing_realtime_keyword_reads(
+        realtime_data,
+        {
+            "ChargeMode": 1,
+            "LightLED": 0,
+            "LogoLED": 100,
+            "VoltageInstallation": 240,
+        },
+    )
+
+    envoy = await _get_mock_trydan()
+    data = await envoy.get_data()
+
+    assert data.charge_mode == ChargeMode.THREEPHASIC
+    assert data.light_led == 0
+    assert data.logo_led == 100
+    assert data.voltage_installation == 240
 
 
 def test_charge_state_vendor_values():

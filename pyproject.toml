@@ -44,6 +44,7 @@ respx = ">=0.22"
 tenacity = "^8.2.3"
 typer = "^0.9.0"
 pre-commit = "^4.6.0"
+mypy = "^2.1.0"
 
 [tool.poetry.group.docs]
 optional = true

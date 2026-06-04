@@ -4,15 +4,19 @@ from httpx import Response
 
 from pytrydan import ChargeMode, TrydanInvalidValue
 
-from .conftest import _get_mock_trydan, _load_json_fixture
+from .conftest import (
+    _get_mock_trydan,
+    _load_json_fixture,
+    _mock_missing_realtime_keyword_reads,
+)
 
 
 @pytest.mark.asyncio
 @respx.mock
 async def test_binary_sensors():
-    respx.get("/RealTimeData").mock(
-        return_value=Response(200, json=_load_json_fixture("RealTimeData"))
-    )
+    realtime_data = _load_json_fixture("RealTimeData")
+    respx.get("/RealTimeData").mock(return_value=Response(200, json=realtime_data))
+    _mock_missing_realtime_keyword_reads(realtime_data)
 
     envoy = await _get_mock_trydan()
 
