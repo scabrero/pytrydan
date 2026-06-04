@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import logging
+from collections.abc import Callable
+from enum import IntEnum
 from http import HTTPStatus
 from typing import Any
 
@@ -28,20 +32,83 @@ from .models.trydan import (
     TrydanData,
 )
 
-VALIDATION = {
-    "ChargeMode": lambda x: x in ChargeMode,
-    "ChargeState": lambda x: x in ChargeState,
-    "DynamicPowerMode": lambda x: x in DynamicPowerMode,
-    "Dynamic": lambda x: x in DynamicState,
-    "Locked": lambda x: x in LockState,
-    "PauseDynamic": lambda x: x in PauseDynamicState,
-    "Paused": lambda x: x in PauseState,
-    "VoltageInstallation": lambda x: x > 0,
-    "Intensity": lambda x: x >= 6 and x <= 32,
-    "MinIntensity": lambda x: x >= 6 and x <= 32,
-    "MaxIntensity": lambda x: x >= 6 and x <= 32,
-    "LightLED": lambda x: x >= 0 and x <= 100,
-    "LogoLED": lambda x: x >= 0 and x <= 100,
+KeywordValue = str | int | IntEnum
+
+
+def _coerce_int(value: object) -> int | None:
+    """Return the integer value for supported keyword inputs."""
+    if isinstance(value, IntEnum):
+        return value.value
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        try:
+            return int(value)
+        except ValueError:
+            return None
+    return None
+
+
+def _is_enum_value(enum: type[IntEnum], value: object) -> bool:
+    """Return whether value can be serialized as an enum member."""
+    raw_value = _coerce_int(value)
+    if raw_value is None:
+        return False
+
+    try:
+        enum(raw_value)
+    except ValueError:
+        return False
+    return True
+
+
+def _is_intensity(value: object) -> bool:
+    """Return whether value is a valid intensity."""
+    current = _coerce_int(value)
+    if current is None:
+        return False
+    return 6 <= current <= 32
+
+
+def _is_positive_int(value: object) -> bool:
+    """Return whether value is a positive integer."""
+    current = _coerce_int(value)
+    if current is None:
+        return False
+    return current > 0
+
+
+def _is_percentage(value: object) -> bool:
+    """Return whether value is a valid percentage."""
+    percentage = _coerce_int(value)
+    if percentage is None:
+        return False
+    return 0 <= percentage <= 100
+
+
+def _serialize_keyword_value(value: KeywordValue) -> str:
+    """Serialize keyword values for the Trydan write endpoint."""
+    if isinstance(value, IntEnum):
+        return str(value.value)
+    return str(value)
+
+
+VALIDATION: dict[str, Callable[[object], bool]] = {
+    "ChargeMode": lambda value: _is_enum_value(ChargeMode, value),
+    "ChargeState": lambda value: _is_enum_value(ChargeState, value),
+    "ContractedPower": _is_positive_int,
+    "Dynamic": lambda value: _is_enum_value(DynamicState, value),
+    "DynamicPowerMode": lambda value: _is_enum_value(DynamicPowerMode, value),
+    "Intensity": _is_intensity,
+    "LightLED": _is_percentage,
+    "Locked": lambda value: _is_enum_value(LockState, value),
+    "LogoLED": _is_percentage,
+    "MaxIntensity": _is_intensity,
+    "MinIntensity": _is_intensity,
+    "PauseDynamic": lambda value: _is_enum_value(PauseDynamicState, value),
+    "Paused": lambda value: _is_enum_value(PauseState, value),
+    "Timer": lambda value: _is_enum_value(ChargePointTimerState, value),
+    "VoltageInstallation": _is_positive_int,
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -57,9 +124,29 @@ class Trydan:
     ) -> None:
         """Initialize."""
         self._host = host
-        self._client = client or httpx.AsyncClient()
+        self._client = client if client is not None else httpx.AsyncClient()
+        self._owns_client = client is None
         self._timeout = API_TIMEOUT
         self._data: TrydanData | None = None
+        self.raw_data: dict[str, bytes | int] | None = None
+
+    async def __aenter__(self) -> Trydan:
+        """Return this client when used as an async context manager."""
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: object | None,
+    ) -> None:
+        """Close any internally-created HTTP client."""
+        await self.aclose()
+
+    async def aclose(self) -> None:
+        """Close the underlying HTTP client if this instance owns it."""
+        if self._owns_client:
+            await self._client.aclose()
 
     @retry(
         retry=retry_if_exception_type(
@@ -101,18 +188,21 @@ class Trydan:
 
         return response
 
-    async def _json_request(self, end_point: str) -> Any:
+    async def _json_request(self, end_point: str) -> dict[str, Any]:
         """Make a request to Trydan and return the JSON response."""
         response = await self._request(end_point)
         try:
-            return orjson.loads(response.content)
+            data = orjson.loads(response.content)
         except orjson.JSONDecodeError as err:
             _LOGGER.error(
-                "Error decoding JSON response from Trydan: ", response.content
+                "Error decoding JSON response from Trydan: %r", response.content
             )
             raise TrydanInvalidResponse(
                 "Error decoding JSON response from Trydan"
             ) from err
+        if not isinstance(data, dict):
+            raise TrydanInvalidResponse("Expected JSON object response from Trydan")
+        return data
 
     async def get_data(self) -> TrydanData:
         """Get data from Trydan."""
@@ -129,17 +219,7 @@ class Trydan:
     async def set_keyword(
         self,
         keyword: str,
-        value: str
-        | int
-        | ChargeMode
-        | ChargePointTimerState
-        | ChargeState
-        | DynamicPowerMode
-        | DynamicState
-        | LockState
-        | PauseDynamicState
-        | PauseState
-        | TrydanData,
+        value: KeywordValue,
     ) -> None:
         """Set a keyword in Trydan."""
         if keyword not in KEYWORDS:
@@ -151,7 +231,8 @@ class Trydan:
                     f"Value {value} is not valid for keyword {keyword}"
                 )
 
-        url = f"http://{self._host}/write/{keyword}={value}"
+        serialized_value = _serialize_keyword_value(value)
+        url = f"http://{self._host}/write/{keyword}={serialized_value}"
         _LOGGER.debug("HTTP GET: %s", url)
         try:
             data = await self._request(url)
@@ -160,8 +241,8 @@ class Trydan:
 
         if data.status_code != 200 or data.content != b"OK":
             raise TrydanInvalidValue(
-                f"Failed for {keyword}={value}"
-                " code={data.status_code} : <{data.content}>"
+                f"Failed for {keyword}={serialized_value}"
+                f" code={data.status_code} : <{data.content!r}>"
             )
 
     @property
@@ -246,7 +327,7 @@ class Trydan:
 
     async def intensity(self, current: int) -> None:
         """Set the intensity of the Charge Point."""
-        if not (current >= 6 and current <= 32):
+        if not 6 <= current <= 32:
             raise TrydanInvalidValue("Intensity must be between 6 and 32")
 
         await self.set_keyword("Intensity", current)
@@ -288,14 +369,14 @@ class Trydan:
 
     async def min_intensity(self, current: int) -> None:
         """Set the minimum intensity of the Charge Point."""
-        if not (current >= 6 and current <= 32):
+        if not 6 <= current <= 32:
             raise TrydanInvalidValue("Intensity must be between 6 and 32")
 
         await self.set_keyword("MinIntensity", current)
 
     async def max_intensity(self, current: int) -> None:
         """Set the maximum intensity of the Charge Point."""
-        if not (current >= 6 and current <= 32):
+        if not 6 <= current <= 32:
             raise TrydanInvalidValue("Intensity must be between 6 and 32")
 
         await self.set_keyword("MaxIntensity", current)

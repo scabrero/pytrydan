@@ -14,8 +14,11 @@ class ChargeState(IntEnum):
     CONNECTED_NOT_CHARGING = 1
     CONNECTED_CHARGING = 2
     SYSTEM_FAILURE_OR_LEAK_DETECTED = 4
+    PILOT_SHORT = 4
     CONTROL_PILOT_OR_GROUND_FAILURE = 5
+    GENERAL_FAULT = 5
     VENTILATION_REQUIRED = 6
+    VENTILATION = 6
 
 
 class ReadyState(IntEnum):
@@ -126,7 +129,7 @@ class TrydanData:
 
     ID: str | None
     charge_state: ChargeState
-    ready_state: int | None
+    ready_state: ReadyState
     charge_power: float
     voltage_installation: int | None
     charge_energy: float
@@ -136,7 +139,7 @@ class TrydanData:
     house_power: int
     fv_power: float
     battery_power: float | None
-    paused: int
+    paused: PauseState
     locked: LockState
     timer: ChargePointTimerState
     intensity: int

@@ -23,7 +23,7 @@ app = typer.Typer()
 @app.command()
 def status(ip: str) -> None:
     """Retrieve Trydan Status."""
-    print("Connecting to %s", ip_address(ip))
+    print(f"Connecting to {ip_address(ip)}")
 
     asyncio.run(trydan_status(ip))
 
@@ -31,7 +31,7 @@ def status(ip: str) -> None:
 @app.command()
 def connected(ip: str) -> None:
     """Retrieve Trydan Status."""
-    print("Connecting to %s", ip_address(ip))
+    print(f"Connecting to {ip_address(ip)}")
 
     asyncio.run(trydan_connected(ip))
 
@@ -39,7 +39,7 @@ def connected(ip: str) -> None:
 @app.command()
 def charging(ip: str) -> None:
     """Retrieve Trydan Status."""
-    print("Connecting to %s", ip_address(ip))
+    print(f"Connecting to {ip_address(ip)}")
 
     asyncio.run(trydan_charging(ip))
 
@@ -47,7 +47,7 @@ def charging(ip: str) -> None:
 @app.command()
 def ready(ip: str) -> None:
     """Retrieve Trydan Status."""
-    print("Connecting to %s", ip_address(ip))
+    print(f"Connecting to {ip_address(ip)}")
 
     asyncio.run(trydan_ready(ip))
 
@@ -55,7 +55,7 @@ def ready(ip: str) -> None:
 @app.command()
 def pause(ip: str) -> None:
     """Pause Trydan EVSE."""
-    print("Connecting to %s", ip_address(ip))
+    print(f"Connecting to {ip_address(ip)}")
 
     asyncio.run(trydan_pause(ip))
 
@@ -63,7 +63,7 @@ def pause(ip: str) -> None:
 @app.command()
 def resume(ip: str) -> None:
     """Resume Trydan EVSE."""
-    print("Connecting to %s", ip_address(ip))
+    print(f"Connecting to {ip_address(ip)}")
 
     asyncio.run(trydan_resume(ip))
 
@@ -71,7 +71,7 @@ def resume(ip: str) -> None:
 @app.command()
 def lock(ip: str) -> None:
     """Lock Trydan EVSE."""
-    print("Connecting to %s", ip_address(ip))
+    print(f"Connecting to {ip_address(ip)}")
 
     asyncio.run(trydan_lock(ip))
 
@@ -79,7 +79,7 @@ def lock(ip: str) -> None:
 @app.command()
 def unlock(ip: str) -> None:
     """Unlock Trydan EVSE."""
-    print("Connecting to %s", ip_address(ip))
+    print(f"Connecting to {ip_address(ip)}")
 
     asyncio.run(trydan_unlock(ip))
 
@@ -87,7 +87,7 @@ def unlock(ip: str) -> None:
 @app.command()
 def intensity(ip: str, intensity: int) -> None:
     """Set Intensity in Trydan EVSE."""
-    print("Connecting to %s", ip_address(ip))
+    print(f"Connecting to {ip_address(ip)}")
 
     asyncio.run(trydan_intensity(ip, intensity))
 
@@ -95,6 +95,6 @@ def intensity(ip: str, intensity: int) -> None:
 @app.command()
 def set(ip: str, keyword: str, value: str) -> None:
     """Set KeyWord value in Trydan."""
-    print("Connecting to %s", ip_address(ip))
+    print(f"Connecting to {ip_address(ip)}")
 
     asyncio.run(trydan_set(ip, keyword, value))

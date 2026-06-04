@@ -43,6 +43,7 @@ syrupy = "^4.6.0"
 respx = ">=0.22"
 tenacity = "^8.2.3"
 typer = "^0.9.0"
+pre-commit = "^4.6.0"
 
 [tool.poetry.group.docs]
 optional = true
@@ -120,6 +121,7 @@ select = [
     "D102",
     "D103",
     "D104",
+    "S603",
     "S101",
 ]
 "setup.py" = ["D100"]
@@ -143,6 +145,14 @@ exclude = [
     'docs/.*',
     'setup.py',
 ]
+
+[[tool.mypy.overrides]]
+module = [
+    "rich.*",
+    "tenacity.*",
+    "typer.*",
+]
+ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = "tests.*"

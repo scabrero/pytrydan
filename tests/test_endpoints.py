@@ -115,14 +115,17 @@ def test_charge_state_vendor_values():
         TrydanData.from_api({**data, "ChargeState": 4}).charge_state
         == ChargeState.SYSTEM_FAILURE_OR_LEAK_DETECTED
     )
+    assert ChargeState.PILOT_SHORT == ChargeState.SYSTEM_FAILURE_OR_LEAK_DETECTED
     assert (
         TrydanData.from_api({**data, "ChargeState": 5}).charge_state
         == ChargeState.CONTROL_PILOT_OR_GROUND_FAILURE
     )
+    assert ChargeState.GENERAL_FAULT == ChargeState.CONTROL_PILOT_OR_GROUND_FAILURE
     assert (
         TrydanData.from_api({**data, "ChargeState": 6}).charge_state
         == ChargeState.VENTILATION_REQUIRED
     )
+    assert ChargeState.VENTILATION == ChargeState.VENTILATION_REQUIRED
 
 
 def test_charge_mode_when_available():

@@ -17,6 +17,7 @@ from .models.trydan import (
     LockState,
     PauseDynamicState,
     PauseState,
+    ReadyState,
     SlaveCommunicationState,
     TrydanData,
 )
@@ -32,6 +33,7 @@ __all__ = [
     "LockState",
     "PauseDynamicState",
     "PauseState",
+    "ReadyState",
     "SlaveCommunicationState",
     "Trydan",
     "TrydanCommunicationError",
