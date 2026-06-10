@@ -215,9 +215,10 @@ class Trydan:
         try:
             response = await self._request(f"http://{self._host}/read/{keyword}")
         except TrydanInvalidResponse as err:
-            if self.raw_data is not None and self.raw_data.get(
-                "status_code"
-            ) == HTTPStatus.NOT_FOUND:
+            if (
+                self.raw_data is not None
+                and self.raw_data.get("status_code") == HTTPStatus.NOT_FOUND
+            ):
                 raise _TrydanKeywordUnavailable from err
             raise
         return self._parse_keyword_value(response.text.strip())
