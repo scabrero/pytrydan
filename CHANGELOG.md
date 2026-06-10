@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.2 (2026-06-10)
+
+### Bug fixes
+
+- Ignore unavailable read endpoints ([`60bd28e`](https://github.com/dgomes/pytrydan/commit/60bd28e3c8090dd1ec91659cb0eafb0843e4db11))
+
 ## v1.0.1 (2026-06-04)
 
 ### Bug fixes
