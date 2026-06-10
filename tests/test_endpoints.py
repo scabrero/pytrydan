@@ -2,6 +2,7 @@ import pytest
 import respx
 from httpx import Response
 
+from pytrydan.const import KEYWORDS
 from pytrydan.exceptions import (
     ChargeStateInvalid,
     TrydanCommunicationError,
@@ -128,6 +129,23 @@ async def test_status_reads_missing_realtime_data_keywords():
     assert data.light_led == 0
     assert data.logo_led == 100
     assert data.voltage_installation == 240
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_status_ignores_unavailable_realtime_data_keywords():
+    realtime_data = _load_json_fixture("RealTimeData")
+    respx.get("/RealTimeData").mock(return_value=Response(200, json=realtime_data))
+    for keyword in KEYWORDS.difference(realtime_data):
+        respx.get(f"/read/{keyword}").mock(return_value=Response(404, json={}))
+
+    envoy = await _get_mock_trydan()
+    data = await envoy.get_data()
+
+    assert data.charge_mode is None
+    assert data.light_led is None
+    assert data.logo_led is None
+    assert data.voltage_installation is None
 
 
 def test_charge_state_vendor_values():

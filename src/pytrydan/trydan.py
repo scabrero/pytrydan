@@ -114,6 +114,10 @@ VALIDATION: dict[str, Callable[[object], bool]] = {
 _LOGGER = logging.getLogger(__name__)
 
 
+class _TrydanKeywordUnavailable(Exception):
+    """Raised when a keyword read endpoint is not available."""
+
+
 class Trydan:
     """Class for communicating with Trydan."""
 
@@ -129,6 +133,7 @@ class Trydan:
         self._timeout = API_TIMEOUT
         self._data: TrydanData | None = None
         self._realtime_data_missing_keywords: set[str] | None = None
+        self._unavailable_realtime_data_keywords: set[str] = set()
         self.raw_data: dict[str, bytes | int] | None = None
 
     async def __aenter__(self) -> Trydan:
@@ -207,7 +212,14 @@ class Trydan:
 
     async def _read_keyword(self, keyword: str) -> Any:
         """Read a single keyword from Trydan."""
-        response = await self._request(f"http://{self._host}/read/{keyword}")
+        try:
+            response = await self._request(f"http://{self._host}/read/{keyword}")
+        except TrydanInvalidResponse as err:
+            if self.raw_data is not None and self.raw_data.get(
+                "status_code"
+            ) == HTTPStatus.NOT_FOUND:
+                raise _TrydanKeywordUnavailable from err
+            raise
         return self._parse_keyword_value(response.text.strip())
 
     @staticmethod
@@ -227,13 +239,21 @@ class Trydan:
         self, data: dict[str, Any]
     ) -> dict[str, Any]:
         """Fill RealTimeData with keywords that require the read endpoint."""
+        missing_keywords = KEYWORDS.difference(data).difference(
+            self._unavailable_realtime_data_keywords
+        )
         if self._realtime_data_missing_keywords is None:
-            self._realtime_data_missing_keywords = KEYWORDS.difference(data)
+            self._realtime_data_missing_keywords = missing_keywords
         else:
-            self._realtime_data_missing_keywords.update(KEYWORDS.difference(data))
+            self._realtime_data_missing_keywords.update(missing_keywords)
 
         for keyword in sorted(self._realtime_data_missing_keywords):
-            data[keyword] = await self._read_keyword(keyword)
+            try:
+                data[keyword] = await self._read_keyword(keyword)
+            except _TrydanKeywordUnavailable:
+                _LOGGER.debug("Read endpoint for %s is not available", keyword)
+                self._unavailable_realtime_data_keywords.add(keyword)
+                self._realtime_data_missing_keywords.discard(keyword)
 
         return data
 
