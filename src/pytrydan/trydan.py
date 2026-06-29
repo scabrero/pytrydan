@@ -86,6 +86,14 @@ def _is_percentage(value: object) -> bool:
     return 0 <= percentage <= 100
 
 
+def _is_contracted_power(value: object) -> bool:
+    """Return whether value is a valid contracted power."""
+    current = _coerce_int(value)
+    if current is None:
+        return False
+    return -5000 <= current <= 10000
+
+
 def _serialize_keyword_value(value: KeywordValue) -> str:
     """Serialize keyword values for the Trydan write endpoint."""
     if isinstance(value, IntEnum):
@@ -96,7 +104,7 @@ def _serialize_keyword_value(value: KeywordValue) -> str:
 VALIDATION: dict[str, Callable[[object], bool]] = {
     "ChargeMode": lambda value: _is_enum_value(ChargeMode, value),
     "ChargeState": lambda value: _is_enum_value(ChargeState, value),
-    "ContractedPower": _is_positive_int,
+    "ContractedPower": _is_contracted_power,
     "Dynamic": lambda value: _is_enum_value(DynamicState, value),
     "DynamicPowerMode": lambda value: _is_enum_value(DynamicPowerMode, value),
     "Intensity": _is_intensity,
@@ -455,6 +463,13 @@ class Trydan:
 
     async def contracted_power(self, power: int) -> None:
         """Set the Contracted Power."""
-        if not (power > 0):
+        if (
+            self.data.dynamic_power_mode
+            not in (
+                DynamicPowerMode.TIMED_POWER_ENABLED,
+                DynamicPowerMode.TIMED_POWER_DISABLED_AND_FV_EXCL_MODE_SETTED,
+            )
+            and power < 0
+        ):
             raise TrydanInvalidValue("Contracted Power must be positive")
         await self.set_keyword("ContractedPower", power)
