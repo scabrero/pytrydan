@@ -303,7 +303,7 @@ class Trydan:
             )
 
     @property
-    def data(self) -> TrydanData | None:
+    def data(self) -> TrydanData:
         """Return cached version of Trydan EVSE."""
         if self._data is None:
             raise TrydanRetryLater("no initial data retrieved")
